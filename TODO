@@ -1,6 +1,0 @@
-1. implement string hashing
-2. use ngrams for similarity checking
-
-for this, hash out the strings, form trigrams, then sort the ngrams, then expand both to a vector of size (size1 + size2), then get the frequency vectors and then find cosine similarity of the frequency vectors
-
-Time (almost done) and space complexity (complete)

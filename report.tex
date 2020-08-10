@@ -23,14 +23,14 @@ To run the code, run \texttt{./plagChecker <LOCATION\_OF\_TEST\_FILE> <LOCATION\
 \\
 \textbf{Important Note:} When passing the location of the corpus folder, ensure that it ends with a /
 \\
-This code has been tested to run on Linux (Ubuntu 20.04), and couldn't be tested on Windows due to the lack of a Windows machine.
+This code has been tested to run on Linux (Ubuntu 20.04), and couldn't be tested on Windows due to the lack of a Windows machine. However this will work on POSIX-compliant machines.
 
 \section*{The Model}
 
 \subsection*{Introduction to $N$-grams}
 A concept widely used in natural language processing, word $N$-grams are essentially ``phrases'' of length $N$ in a given text, for our purposes. 
 Their main importance is in the fact that they can represent Markov chains of length $N$, which allows for a simple representation of phrases which is also natural fit for languages like English, because the main structures that stand out in a text are linear owing to the low nesting-levels in most languages.
-Their relevance to our use-case is that in a plagiarized document, the frequency of any particular phrase should be heuristically similar to those in the document where it was plagiarized from.
+Their relevance to our use-case is that in a plagiarized document, the frequency of any particular phrase should be heuristically similar to that in the document where it was plagiarized from.
 
 \subsection*{High-level Description of the Algorithm}
 
@@ -42,12 +42,13 @@ We also remove all words whose length is less than 3, so as to remove commonly u
 \section*{Working of Code}
 
 \begin{enumerate}
-    \item \texttt{long long int stringHash(char* s)}: This function computes the hash of a string as mentioned above. Time complexity is $\mathcal{O}$(length of string).
-    \item \texttt{long long int ngramHash(long long int a, long long int b, long long int c)}: This function computes the hash of a $3$-gram, as mentioned above. Time complexity is $\mathcal{O}(1)$.
-    \item \texttt{void sort(long long int* a, int l, int r)}: This function sorts the subarray \texttt{a[l..r]} using merge-sort. Time complexity is $\mathcal{O}(r - l + 1)$.
-    \item \texttt{long long int* workFile(char* fileName)}: This function returns a pointer to the sorted array containing the hashes of all the $3$-grams in the file whose name is \texttt{fileName}. Time complexity is $\mathcal{O}$(total length + $N \log N$) where $N$ is the number of words in the file.
-    \item \texttt{float findSimilarity(long long int* a, int n, long long int* b, int m)}: This function computes the frequency arrays for the arrays pointed to by \texttt{a} and \texttt{b}, and then finds the cosine similarity between them and returns the similarity as a ratio between $0$ and $1$. Time complexity is $\mathcal{O}(n + m)$.
+    \item \texttt{long long int stringHash(char* s)}: This function computes the hash of a string as mentioned above. Time complexity is $\mathcal{O}$(length of string), and space complexity is $\mathcal{O}(1)$.
+    \item \texttt{long long int ngramHash(long long int a, long long int b, long long int c)}: This function computes the hash of a $3$-gram, as mentioned above. Time complexity is $\mathcal{O}(1)$ and space complexity is $\mathcal{O}(1)$.
+    \item \texttt{void sort(long long int* a, int l, int r)}: This function sorts the subarray \texttt{a[l..r]} using merge-sort. Time complexity is $\mathcal{O}(r - l + 1)$ and space complexity is $\mathcal{O}(1)$ (since we use a global buffer).
+    \item \texttt{long long int* workFile(char* fileName)}: This function returns a pointer to the sorted array containing the hashes of all the $3$-grams in the file whose name is \texttt{fileName}. Time complexity is $\mathcal{O}$(total length + $N \log N$) and space complexity is $\mathcal{O}(N)$ where $N$ is the number of words in the file (we reuse the buffer used in the previous function).
+    \item \texttt{float findSimilarity(long long int* a, int n, long long int* b, int m)}: This function computes the frequency arrays for the arrays pointed to by \texttt{a} and \texttt{b}, and then finds the cosine similarity between them and returns the similarity as a ratio between $0$ and $1$. Time complexity is $\mathcal{O}(n + m)$ and space complexity is also $\mathcal{O}(n + m)$.
     \item \texttt{int main(int argc, char* argv[])}: This is the main function, and here we traverse over all files in the given corpus directory, and find the similarity between the queried file and the corpus files, one corpus file at a time. 
+        For the time complexity, suppose the number of corpus files is $t$, the total number of characters in all corpus text files and the queried test file is $s$, the total number of words in file $i$ is $n_i$, with the queried file being file $0$, and the rest being corpus files. Then the time complexity is $\mathcal{O}(s + \sum_{i = 0}^t n_i \log n_i + tn_0)$. The space complexity is $\mathcal{O}(n_0 + \max_{i = 1}^t n_i)$, apart from a global buffer.
 \end{enumerate}
 
 
