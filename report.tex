@@ -1,0 +1,55 @@
+\documentclass{article}
+\usepackage[utf8]{inputenc}
+\usepackage[margin=1in]{geometry}
+\usepackage{graphicx} 
+\title{\fontfamily{cmss}\selectfont Plagiarism Checker}
+\author{Navneel Singhal}
+\date{August 2020}
+
+\newcommand{\ttt}{\texttt}
+
+\begin{document}
+
+\maketitle
+
+\section*{Description}
+
+The assignment was to implement a plagiarism checker in C.
+
+\section*{Usage}
+
+To compile the code, run the command \texttt{make}. \\
+To run the code, run \texttt{./plagChecker <LOCATION\_OF\_TEST\_FILE> <LOCATION\_OF\_CORPUS\_FOLDER>}.
+\\
+\textbf{Important Note:} When passing the location of the corpus folder, ensure that it ends with a /
+\\
+This code has been tested to run on Linux (Ubuntu 20.04), and couldn't be tested on Windows due to the lack of a Windows machine.
+
+\section*{The Model}
+
+\subsection*{Introduction to $N$-grams}
+A concept widely used in natural language processing, word $N$-grams are essentially ``phrases'' of length $N$ in a given text, for our purposes. 
+Their main importance is in the fact that they can represent Markov chains of length $N$, which allows for a simple representation of phrases which is also natural fit for languages like English, because the main structures that stand out in a text are linear owing to the low nesting-levels in most languages.
+Their relevance to our use-case is that in a plagiarized document, the frequency of any particular phrase should be heuristically similar to those in the document where it was plagiarized from.
+
+\subsection*{High-level Description of the Algorithm}
+
+From any given text, we extract a frequency table of $3$-grams, and find the cosine similarity between any two such vectors (with a frequency of 0 to features which don't appear in the file so as to align the feature vectors).\\
+To make this extraction robust and resistant to the usage of different cases, we tokenize the text with respect to whitespace, commas, full-stops and newline characters, and then for each of the extracted strings, we convert them to lower case.
+To make the task of feature extraction simpler, we use a polynomial hash (with base $127$) for each string, and for each $3$-gram (which is now a triple of integers modulo $10^9 + 7$), we use a different polynomial hash (with base $997$ so as to not bring in any unwanted correlation between concatenated words or something else of this sort).\\
+We also remove all words whose length is less than 3, so as to remove commonly used words from consideration.
+
+\section*{Working of Code}
+
+\begin{enumerate}
+    \item \texttt{long long int stringHash(char* s)}: This function computes the hash of a string as mentioned above. Time complexity is $\mathcal{O}$(length of string).
+    \item \texttt{long long int ngramHash(long long int a, long long int b, long long int c)}: This function computes the hash of a $3$-gram, as mentioned above. Time complexity is $\mathcal{O}(1)$.
+    \item \texttt{void sort(long long int* a, int l, int r)}: This function sorts the subarray \texttt{a[l..r]} using merge-sort. Time complexity is $\mathcal{O}(r - l + 1)$.
+    \item \texttt{long long int* workFile(char* fileName)}: This function returns a pointer to the sorted array containing the hashes of all the $3$-grams in the file whose name is \texttt{fileName}. Time complexity is $\mathcal{O}$(total length + $N \log N$) where $N$ is the number of words in the file.
+    \item \texttt{float findSimilarity(long long int* a, int n, long long int* b, int m)}: This function computes the frequency arrays for the arrays pointed to by \texttt{a} and \texttt{b}, and then finds the cosine similarity between them and returns the similarity as a ratio between $0$ and $1$. Time complexity is $\mathcal{O}(n + m)$.
+    \item \texttt{int main(int argc, char* argv[])}: This is the main function, and here we traverse over all files in the given corpus directory, and find the similarity between the queried file and the corpus files, one corpus file at a time. 
+\end{enumerate}
+
+
+\end{document}
+
