@@ -15,12 +15,9 @@ long long int stringHash(char* s) {
     int n = strlen(s);
     long long int hash = 0;
     for (int i = 0; i < n; ++i) {
-        if (s[i] == '\r') continue;
+        if (!isalpha(s[i])) continue;
         hash *= p;
-        if (isalpha(s[i]))
-            hash += tolower(s[i]);
-        else
-            hash += s[i];
+        hash += tolower(s[i]);
         hash %= mod;
     }
     return hash;
